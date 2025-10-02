@@ -31,51 +31,57 @@ class HomeController extends GetxController {
       final currentUserId = Get.find<AuthController>().uid.value;
       if (currentUserId == null) return;
 
+      print('🔍 Loading conversations for user: $currentUserId');
+
       // Query all chats where the user is a participant
-      // Chat IDs follow format: uid1_uid2
       final chatsSnapshot = await _db
           .collection('chats')
-          .where(FieldPath.documentId, isGreaterThanOrEqualTo: currentUserId)
+          .where('participants', arrayContains: currentUserId)
+          .orderBy('updatedAt', descending: true)
           .get();
 
-      final chatsSnapshot2 = await _db
-          .collection('chats')
-          .where(FieldPath.documentId, isLessThan: currentUserId + '\uf8ff')
-          .get();
+      print('📊 Found ${chatsSnapshot.docs.length} chats');
 
-      // Combine both queries
       final allChats = <Map<String, dynamic>>[];
 
-      for (var doc in [...chatsSnapshot.docs, ...chatsSnapshot2.docs]) {
+      for (var doc in chatsSnapshot.docs) {
         final chatId = doc.id;
-        // Check if current user is in the chatId
-        if (chatId.contains(currentUserId)) {
-          final data = doc.data();
-          // Extract other user's ID
-          final parts = chatId.split('_');
-          final otherUserId = parts[0] == currentUserId ? parts[1] : parts[0];
+        final data = doc.data();
 
-          // Get other user's info
-          final userDoc = await _db.collection('users').doc(otherUserId).get();
-          final userData = userDoc.data() ?? {};
+        // Extract other user's ID
+        final participants = List<String>.from(data['participants'] ?? []);
+        final otherUserId = participants.firstWhere(
+          (id) => id != currentUserId,
+          orElse: () => '',
+        );
 
-          allChats.add({
-            'chatId': chatId,
-            'otherUserId': otherUserId,
-            'otherUserName': userData['name'] ?? 'Unknown',
-            'otherUserEmail': userData['email'] ?? '',
-            'lastMessage': data['lastMessage'] ?? 'No messages yet',
-            'updatedAt': data['updatedAt'] ?? 0,
-          });
-        }
+        if (otherUserId.isEmpty) continue;
+
+        // Get other user's info
+        final userDoc = await _db.collection('users').doc(otherUserId).get();
+        final userData = userDoc.data() ?? {};
+
+        allChats.add({
+          'chatId': chatId,
+          'otherUserId': otherUserId,
+          'otherUserName': userData['name'] ?? 'Unknown',
+          'otherUserEmail': userData['email'] ?? '',
+          'lastMessage': data['lastMessage'] ?? 'ຍັງບໍ່ມີຂໍ້ຄວາມ',
+          'updatedAt': data['updatedAt'] ?? 0,
+        });
       }
 
-      // Sort by most recent
-      allChats.sort(
-          (a, b) => (b['updatedAt'] as int).compareTo(a['updatedAt'] as int));
       conversations.value = allChats;
+      print('✅ Loaded ${allChats.length} conversations');
     } catch (e) {
-      print('Error loading conversations: $e');
+      print('❌ Error loading conversations: $e');
+      Get.snackbar(
+        'ເກີດຂໍ້ຜິດພາດ',
+        'ບໍ່ສາມາດໂຫຼດລາຍການສົນທະນາໄດ້: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red[100],
+        duration: const Duration(seconds: 3),
+      );
     } finally {
       isLoadingChats.value = false;
     }
@@ -149,8 +155,10 @@ class HomeController extends GetxController {
 
       // Create chat document if it doesn't exist
       await _db.collection('chats').doc(chatId).set({
+        'participants': [currentUserId, otherUserId],
         'createdAt': DateTime.now().millisecondsSinceEpoch,
         'updatedAt': DateTime.now().millisecondsSinceEpoch,
+        'lastMessage': '',
       }, SetOptions(merge: true));
 
       // Navigate to chat

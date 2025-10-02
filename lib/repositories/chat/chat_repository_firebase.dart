@@ -35,7 +35,10 @@ class ChatRepositoryFirebase implements IChatRepository {
       'text': text,
       'timestamp': DateTime.now().millisecondsSinceEpoch,
     }, SetOptions(merge: true));
+
+    // Update chat document with participants array and lastMessage
     await _db.collection('chats').doc(chatId).set({
+      'participants': [senderId, receiverId],
       'lastMessage': text,
       'updatedAt': DateTime.now().millisecondsSinceEpoch
     }, SetOptions(merge: true));
@@ -75,9 +78,10 @@ class ChatRepositoryFirebase implements IChatRepository {
       'timestamp': DateTime.now().millisecondsSinceEpoch,
     }, SetOptions(merge: true));
 
-    // Update chat document with lastMessage
+    // Update chat document with participants array and lastMessage
     await _db.collection('chats').doc(chatId).set({
-      'lastMessage': '📷 Image',
+      'participants': [senderId, receiverId],
+      'lastMessage': '📷 ຮູບພາບ',
       'updatedAt': DateTime.now().millisecondsSinceEpoch
     }, SetOptions(merge: true));
   }
