@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "335986082637",
+    "project_id": "whatsapp-e462b",
+    "storage_bucket": "whatsapp-e462b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:335986082637:android:58c96a469e908b2aa72d04",
+        "android_client_info": {
+          "package_name": "com.example.flutter_chat_app_playable"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBu0Ps_nXqK5OzvxLXbZrvQkFm_Zat5kg8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:335986082637:android:3ec2d4b961bbd92da72d04",
+        "android_client_info": {
+          "package_name": "com.sdl.SmartTalk"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBu0Ps_nXqK5OzvxLXbZrvQkFm_Zat5kg8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

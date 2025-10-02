@@ -1,0 +1,51 @@
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs20"
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "whatsapp-e462b",
+          "appId": "1:335986082637:android:58c96a469e908b2aa72d04",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "whatsapp-e462b",
+          "appId": "1:335986082637:ios:bd9783c077216aeba72d04",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "macos": {
+        "default": {
+          "projectId": "whatsapp-e462b",
+          "appId": "1:335986082637:ios:bd9783c077216aeba72d04",
+          "uploadDebugSymbols": false,
+          "fileOutput": "macos/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "whatsapp-e462b",
+          "configurations": {
+            "android": "1:335986082637:android:58c96a469e908b2aa72d04",
+            "ios": "1:335986082637:ios:bd9783c077216aeba72d04",
+            "macos": "1:335986082637:ios:bd9783c077216aeba72d04",
+            "web": "1:335986082637:web:7284b1ffb7a721b1a72d04",
+            "windows": "1:335986082637:web:ad655f11deb4bdf5a72d04"
+          }
+        }
+      }
+    }
+  }
+}
