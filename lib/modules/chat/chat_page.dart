@@ -45,6 +45,9 @@ class _ChatPageState extends State<ChatPage> {
       chatId: chatId,
       currentUserId: currentUserId,
     );
+
+    // Mark messages as read when opening chat
+    c.markAsRead(chatId, currentUserId);
   }
 
   @override

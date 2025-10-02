@@ -72,6 +72,8 @@ class HomePage extends StatelessWidget {
               final dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
               final timeStr = _formatTime(dateTime);
 
+              final unreadCount = chat['unreadCount'] ?? 0;
+
               return ListTile(
                 leading: CircleAvatar(
                   backgroundColor: Colors.blue[700],
@@ -91,18 +93,46 @@ class HomePage extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                trailing: Text(
-                  timeStr,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                  ),
+                trailing: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      timeStr,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    if (unreadCount > 0) ...[
+                      const SizedBox(height: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          unreadCount > 99 ? '99+' : unreadCount.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
                 onTap: () {
                   Get.toNamed(
                     AppRoutes.CHAT,
                     arguments: {'chatId': chat['chatId']},
-                  )?.then((_) => controller.loadConversations());
+                  );
+                  // Real-time listener will automatically update unread count
                 },
               );
             },
@@ -111,7 +141,7 @@ class HomePage extends StatelessWidget {
       }),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showUsersDialog(context, controller),
-        child: const Icon(Icons.person_add),
+        child: const Icon(Icons.message_outlined),
       ),
     );
   }

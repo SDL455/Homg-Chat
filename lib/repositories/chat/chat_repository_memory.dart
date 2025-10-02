@@ -49,4 +49,11 @@ class ChatRepositoryMemory implements IChatRepository {
     _store[chatId]!.add(msg);
     _controllers[chatId]?.add(List.from(_store[chatId]!.reversed));
   }
+
+  @override
+  Future<void> markAsRead(String chatId, String userId) async {
+    // For memory implementation, we don't need to track read status
+    // This is just a stub to satisfy the interface
+    await Future.delayed(Duration.zero);
+  }
 }

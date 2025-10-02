@@ -36,11 +36,17 @@ class ChatRepositoryFirebase implements IChatRepository {
       'timestamp': DateTime.now().millisecondsSinceEpoch,
     }, SetOptions(merge: true));
 
+    // Get current unread count for receiver
+    final chatDoc = await _db.collection('chats').doc(chatId).get();
+    final currentUnreadCount = chatDoc.data()?['unreadCount_$receiverId'] ?? 0;
+
     // Update chat document with participants array and lastMessage
     await _db.collection('chats').doc(chatId).set({
       'participants': [senderId, receiverId],
       'lastMessage': text,
-      'updatedAt': DateTime.now().millisecondsSinceEpoch
+      'updatedAt': DateTime.now().millisecondsSinceEpoch,
+      'unreadCount_$receiverId':
+          currentUnreadCount + 1, // Increment unread count for receiver
     }, SetOptions(merge: true));
   }
 
@@ -78,11 +84,24 @@ class ChatRepositoryFirebase implements IChatRepository {
       'timestamp': DateTime.now().millisecondsSinceEpoch,
     }, SetOptions(merge: true));
 
+    // Get current unread count for receiver
+    final chatDoc = await _db.collection('chats').doc(chatId).get();
+    final currentUnreadCount = chatDoc.data()?['unreadCount_$receiverId'] ?? 0;
+
     // Update chat document with participants array and lastMessage
     await _db.collection('chats').doc(chatId).set({
       'participants': [senderId, receiverId],
       'lastMessage': '📷 ຮູບພາບ',
-      'updatedAt': DateTime.now().millisecondsSinceEpoch
+      'updatedAt': DateTime.now().millisecondsSinceEpoch,
+      'unreadCount_$receiverId':
+          currentUnreadCount + 1, // Increment unread count for receiver
+    }, SetOptions(merge: true));
+  }
+
+  @override
+  Future<void> markAsRead(String chatId, String userId) async {
+    await _db.collection('chats').doc(chatId).set({
+      'unreadCount_$userId': 0,
     }, SetOptions(merge: true));
   }
 }

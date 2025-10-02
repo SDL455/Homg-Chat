@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Chat App',
+      title: 'Hmong Chat',
       theme: ThemeData(
         useMaterial3: true,
         colorSchemeSeed: Colors.indigo,

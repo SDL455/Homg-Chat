@@ -18,29 +18,37 @@ class HomeController extends GetxController {
   final RxBool isLoadingUsers = false.obs;
   final RxBool isLoadingChats = false.obs;
 
+  // Stream subscription for real-time updates
+  var _chatsSubscription;
+
   @override
   void onInit() {
     super.onInit();
-    loadConversations();
+    _setupChatsListener();
   }
 
-  /// Load all conversations for current user
-  Future<void> loadConversations() async {
-    try {
-      isLoadingChats.value = true;
-      final currentUserId = Get.find<AuthController>().uid.value;
-      if (currentUserId == null) return;
+  @override
+  void onClose() {
+    _chatsSubscription?.cancel();
+    super.onClose();
+  }
 
-      print('🔍 Loading conversations for user: $currentUserId');
+  /// Setup real-time listener for conversations
+  void _setupChatsListener() {
+    final currentUserId = Get.find<AuthController>().uid.value;
+    if (currentUserId == null) return;
 
-      // Query all chats where the user is a participant
-      final chatsSnapshot = await _db
-          .collection('chats')
-          .where('participants', arrayContains: currentUserId)
-          .orderBy('updatedAt', descending: true)
-          .get();
+    isLoadingChats.value = true;
+    print('🔍 Setting up real-time listener for user: $currentUserId');
 
-      print('📊 Found ${chatsSnapshot.docs.length} chats');
+    _chatsSubscription = _db
+        .collection('chats')
+        .where('participants', arrayContains: currentUserId)
+        .orderBy('updatedAt', descending: true)
+        .snapshots()
+        .listen((chatsSnapshot) async {
+      print(
+          '📊 Received ${chatsSnapshot.docs.length} chats from real-time listener');
 
       final allChats = <Map<String, dynamic>>[];
 
@@ -61,6 +69,9 @@ class HomeController extends GetxController {
         final userDoc = await _db.collection('users').doc(otherUserId).get();
         final userData = userDoc.data() ?? {};
 
+        // Get unread count for current user
+        final unreadCount = data['unreadCount_$currentUserId'] ?? 0;
+
         allChats.add({
           'chatId': chatId,
           'otherUserId': otherUserId,
@@ -68,13 +79,16 @@ class HomeController extends GetxController {
           'otherUserEmail': userData['email'] ?? '',
           'lastMessage': data['lastMessage'] ?? 'ຍັງບໍ່ມີຂໍ້ຄວາມ',
           'updatedAt': data['updatedAt'] ?? 0,
+          'unreadCount': unreadCount,
         });
       }
 
       conversations.value = allChats;
-      print('✅ Loaded ${allChats.length} conversations');
-    } catch (e) {
-      print('❌ Error loading conversations: $e');
+      isLoadingChats.value = false;
+      print('✅ Updated ${allChats.length} conversations with unread counts');
+    }, onError: (e) {
+      print('❌ Error in chats listener: $e');
+      isLoadingChats.value = false;
       Get.snackbar(
         'ເກີດຂໍ້ຜິດພາດ',
         'ບໍ່ສາມາດໂຫຼດລາຍການສົນທະນາໄດ້: $e',
@@ -82,9 +96,15 @@ class HomeController extends GetxController {
         backgroundColor: Colors.red[100],
         duration: const Duration(seconds: 3),
       );
-    } finally {
-      isLoadingChats.value = false;
-    }
+    });
+  }
+
+  /// Load all conversations for current user (for manual refresh)
+  Future<void> loadConversations() async {
+    // Real-time listener will automatically update the data
+    // This method is kept for pull-to-refresh functionality
+    print('🔄 Manual refresh requested');
+    await Future.delayed(const Duration(milliseconds: 500));
   }
 
   /// Load all registered users
@@ -164,9 +184,7 @@ class HomeController extends GetxController {
       // Navigate to chat
       Get.back(); // Close the users dialog
       Get.toNamed(AppRoutes.CHAT, arguments: {'chatId': chatId});
-
-      // Reload conversations
-      loadConversations();
+      // Real-time listener will automatically update the conversations
     } catch (e) {
       print('❌ Error starting chat: $e');
       Get.snackbar(
