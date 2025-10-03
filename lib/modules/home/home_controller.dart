@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../auth/auth_controller.dart';
 import '../../routes/app_routes.dart';
+import '../../services/badge_service.dart';
 
 class HomeController extends GetxController {
   final _db = FirebaseFirestore.instance;
@@ -25,6 +26,7 @@ class HomeController extends GetxController {
   void onInit() {
     super.onInit();
     _setupChatsListener();
+    _updateBadgeFromUnreadMessages();
   }
 
   @override
@@ -86,6 +88,9 @@ class HomeController extends GetxController {
       conversations.value = allChats;
       isLoadingChats.value = false;
       print('✅ Updated ${allChats.length} conversations with unread counts');
+
+      // Update badge count based on unread messages
+      _updateBadgeFromUnreadMessages();
     }, onError: (e) {
       print('❌ Error in chats listener: $e');
       isLoadingChats.value = false;
@@ -194,5 +199,66 @@ class HomeController extends GetxController {
         backgroundColor: Colors.red[100],
       );
     }
+  }
+
+  /// Update badge count based on unread messages
+  void _updateBadgeFromUnreadMessages() {
+    try {
+      final totalUnreadCount = conversations.fold<int>(
+        0,
+        (sum, conversation) => sum + (conversation['unreadCount'] as int? ?? 0),
+      );
+
+      BadgeService.setBadgeCount(totalUnreadCount);
+      print('📱 Badge updated with $totalUnreadCount unread messages');
+    } catch (e) {
+      print('❌ Error updating badge: $e');
+    }
+  }
+
+  /// Mark all conversations as read and clear badge
+  Future<void> markAllAsRead() async {
+    try {
+      await BadgeService.markAllAsRead();
+
+      // Refresh conversations to update unread counts
+      await loadConversations();
+
+      Get.snackbar(
+        'ສຳເລັດ',
+        'ທຸກຂໍ້ຄວາມໄດ້ຖືກອ່ານແລ້ວ',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green[100],
+        duration: const Duration(seconds: 2),
+      );
+    } catch (e) {
+      print('❌ Error marking all as read: $e');
+      Get.snackbar(
+        'ເກີດຂໍ້ຜິດພາດ',
+        'ບໍ່ສາມາດອ່ານທຸກຂໍ້ຄວາມໄດ້: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red[100],
+      );
+    }
+  }
+
+  /// Mark specific conversation as read
+  Future<void> markConversationAsRead(String chatId) async {
+    try {
+      await BadgeService.markConversationAsRead(chatId);
+
+      // Refresh conversations to update unread counts
+      await loadConversations();
+    } catch (e) {
+      print('❌ Error marking conversation as read: $e');
+    }
+  }
+
+  /// Get total unread count across all conversations
+  int get totalUnreadCount {
+    return conversations.fold<int>(
+      0,
+      (sum, conversation) => sum + (conversation['unreadCount'] as int? ?? 0),
+    );
   }
 }

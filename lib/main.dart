@@ -7,6 +7,7 @@ import 'routes/app_pages.dart';
 import 'modules/auth/auth_controller.dart';
 import 'repositories/auth/auth_repo_factory.dart';
 import 'services/fcm_service.dart';
+import 'services/badge_service.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -28,6 +29,10 @@ Future<void> _initFirebaseIfNeeded() async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _initFirebaseIfNeeded();
+
+  // Initialize badge service
+  await BadgeService.initialize();
+
   Get.put(AuthController(AuthRepoFactory.build()), permanent: true);
   runApp(const MyApp());
 }

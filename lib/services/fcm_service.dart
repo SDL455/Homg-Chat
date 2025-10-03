@@ -2,8 +2,10 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 import '../routes/app_routes.dart';
+import 'badge_service.dart';
 
 class FCMService {
   static final FlutterLocalNotificationsPlugin _localNotifications =
@@ -42,6 +44,9 @@ class FCMService {
       initSettings,
       onDidReceiveNotificationResponse: _onNotificationTapped,
     );
+
+    // Initialize badge service
+    await BadgeService.initialize();
 
     // Create Android notification channel
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
@@ -113,6 +118,9 @@ class FCMService {
   static Future<void> _handleForegroundMessage(RemoteMessage message) async {
     print('Foreground message received: ${message.notification?.title}');
 
+    // Increment badge count for new message
+    await BadgeService.incrementBadge();
+
     // Show local notification with navigation data
     final androidDetails = AndroidNotificationDetails(
       'chat_channel',
@@ -153,6 +161,9 @@ class FCMService {
         final chatId = parts[0];
         final messageId = parts[1];
         _navigateToChat(chatId, messageId);
+
+        // Mark conversation as read when notification is tapped
+        BadgeService.markConversationAsRead(chatId);
       }
     }
   }
@@ -164,6 +175,9 @@ class FCMService {
     final messageId = message.data['messageId'];
     if (chatId != null) {
       _navigateToChat(chatId, messageId);
+
+      // Mark conversation as read when notification is clicked
+      BadgeService.markConversationAsRead(chatId);
     }
   }
 
@@ -204,6 +218,9 @@ class FCMService {
             .update({'fcmToken': FieldValue.delete()});
       }
       await FirebaseMessaging.instance.deleteToken();
+
+      // Clear badge on logout
+      await BadgeService.clearBadge();
     } catch (e) {
       print('Error deleting FCM token: $e');
     }
@@ -214,4 +231,14 @@ class FCMService {
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print('Background message received: ${message.notification?.title}');
+
+  // Initialize Firebase if not already done
+  await Firebase.initializeApp();
+
+  // Increment badge count for background messages
+  try {
+    await BadgeService.incrementBadge();
+  } catch (e) {
+    print('Error updating badge in background handler: $e');
+  }
 }

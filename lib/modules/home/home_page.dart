@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../auth/auth_controller.dart';
 import '../../routes/app_routes.dart';
 import 'home_controller.dart';
+import '../../widgets/badge_demo_widget.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -32,31 +33,39 @@ class HomePage extends StatelessWidget {
         }
 
         if (controller.conversations.isEmpty) {
-          return Center(
+          return SingleChildScrollView(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.chat_bubble_outline,
-                  size: 80,
-                  color: Colors.grey[400],
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'ຍັງບໍ່ມີການສົນທະນາ',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.grey[600],
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.chat_bubble_outline,
+                        size: 80,
+                        color: Colors.grey[400],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'ຍັງບໍ່ມີການສົນທະນາ',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'ກົດປຸ່ມ + ເພື່ອເລີ່ມສົນທະນາໃໝ່',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[500],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'ກົດປຸ່ມ + ເພື່ອເລີ່ມສົນທະນາໃໝ່',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[500],
-                  ),
-                ),
+                // Add badge demo widget for testing
+                const BadgeDemoWidget(),
               ],
             ),
           );
@@ -64,78 +73,90 @@ class HomePage extends StatelessWidget {
 
         return RefreshIndicator(
           onRefresh: controller.loadConversations,
-          child: ListView.builder(
-            itemCount: controller.conversations.length,
-            itemBuilder: (context, index) {
-              final chat = controller.conversations[index];
-              final timestamp = chat['updatedAt'] as int;
-              final dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
-              final timeStr = _formatTime(dateTime);
+          child: Column(
+            children: [
+              // Add badge demo widget at the top
+              const BadgeDemoWidget(),
+              // Conversations list
+              Expanded(
+                child: ListView.builder(
+                  itemCount: controller.conversations.length,
+                  itemBuilder: (context, index) {
+                    final chat = controller.conversations[index];
+                    final timestamp = chat['updatedAt'] as int;
+                    final dateTime =
+                        DateTime.fromMillisecondsSinceEpoch(timestamp);
+                    final timeStr = _formatTime(dateTime);
 
-              final unreadCount = chat['unreadCount'] ?? 0;
+                    final unreadCount = chat['unreadCount'] ?? 0;
 
-              return ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: Colors.blue[700],
-                  child: Text(
-                    (chat['otherUserName'] as String)
-                        .substring(0, 1)
-                        .toUpperCase(),
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ),
-                title: Text(
-                  chat['otherUserName'] ?? 'Unknown',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                subtitle: Text(
-                  chat['lastMessage'] ?? '',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                trailing: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      timeStr,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    if (unreadCount > 0) ...[
-                      const SizedBox(height: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                    return ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.blue[700],
                         child: Text(
-                          unreadCount > 99 ? '99+' : unreadCount.toString(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          (chat['otherUserName'] as String)
+                              .substring(0, 1)
+                              .toUpperCase(),
+                          style: const TextStyle(color: Colors.white),
                         ),
                       ),
-                    ],
-                  ],
+                      title: Text(
+                        chat['otherUserName'] ?? 'Unknown',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(
+                        chat['lastMessage'] ?? '',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      trailing: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            timeStr,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          if (unreadCount > 0) ...[
+                            const SizedBox(height: 4),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                unreadCount > 99
+                                    ? '99+'
+                                    : unreadCount.toString(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      onTap: () {
+                        Get.toNamed(
+                          AppRoutes.CHAT,
+                          arguments: {'chatId': chat['chatId']},
+                        );
+                        // Real-time listener will automatically update unread count
+                      },
+                    );
+                  },
                 ),
-                onTap: () {
-                  Get.toNamed(
-                    AppRoutes.CHAT,
-                    arguments: {'chatId': chat['chatId']},
-                  );
-                  // Real-time listener will automatically update unread count
-                },
-              );
-            },
+              ),
+            ],
           ),
         );
       }),
