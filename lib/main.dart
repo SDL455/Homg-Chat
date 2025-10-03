@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chat_app_playable/firebase_options.dart';
 import 'package:get/get.dart';
 import 'core/config/app_config.dart';
-import 'routes/app_routes.dart';
 import 'routes/app_pages.dart';
 import 'modules/auth/auth_controller.dart';
 import 'repositories/auth/auth_repo_factory.dart';

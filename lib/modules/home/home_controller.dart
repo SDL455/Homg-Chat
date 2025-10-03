@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_app_playable/routes/app_pages.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../auth/auth_controller.dart';
-import '../../routes/app_routes.dart';
 import '../../services/badge_service.dart';
 
 class HomeController extends GetxController {

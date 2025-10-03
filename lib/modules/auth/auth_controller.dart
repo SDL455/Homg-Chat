@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_app_playable/routes/app_pages.dart';
 import 'package:get/get.dart';
-import '../../routes/app_routes.dart';
 import '../../repositories/auth/auth_repository.dart';
 
 class AuthController extends GetxController {

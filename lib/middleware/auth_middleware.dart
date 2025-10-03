@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_app_playable/routes/app_pages.dart';
 import 'package:get/get.dart';
 import '../modules/auth/auth_controller.dart';
-import '../routes/app_routes.dart';
 
 /// Middleware to protect routes that require authentication
 class AuthMiddleware extends GetMiddleware {

@@ -7,6 +7,15 @@ import '../modules/chat/chat_page.dart';
 import '../modules/settings/settings_page.dart';
 import '../middleware/auth_middleware.dart';
 
+abstract class AppRoutes {
+  static const SPLASH = '/';
+  static const LOGIN = '/login';
+  static const REGISTER = '/register';
+  static const HOME = '/home';
+  static const CHAT = '/chat';
+  static const SETTINGS = '/settings';
+}
+
 class AppPages {
   static final pages = [
     GetPage(
