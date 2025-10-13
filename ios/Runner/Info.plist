@@ -45,5 +45,15 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- Firebase Cloud Messaging -->
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
+	<!-- Camera and Photo Library Permissions -->
+	<key>NSCameraUsageDescription</key>
+	<string>ແອັບນີ້ຕ້ອງການໃຊ້ກ້ອງເພື່ອຖ່າຍຮູບແລະສົ່ງໃນການສົນທະນາ</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>ແອັບນີ້ຕ້ອງການເຂົ້າເຖິງຮູບພາບເພື່ອສົ່ງໃນການສົນທະນາ</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>ແອັບນີ້ຕ້ອງການໃຊ້ໄມໂຄຣໂຟນເພື່ອບັນທຶກສຽງ</string>
 </dict>
 </plist>

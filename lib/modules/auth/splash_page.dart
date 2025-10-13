@@ -73,7 +73,7 @@ class _SplashPageState extends State<SplashPage>
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 20,
                       offset: const Offset(0, 10),
                     ),
@@ -106,7 +106,7 @@ class _SplashPageState extends State<SplashPage>
                 'Connect with friends',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha: 0.8),
                   letterSpacing: 0.5,
                 ),
               ),
@@ -119,7 +119,7 @@ class _SplashPageState extends State<SplashPage>
                 height: 40,
                 child: CircularProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(
-                    Colors.white.withOpacity(0.8),
+                    Colors.white.withValues(alpha: 0.8),
                   ),
                   strokeWidth: 3,
                 ),

@@ -131,25 +131,25 @@ class BadgeDebugService {
         try {
           final launcherInfo = await platform.invokeMethod('getLauncherInfo');
           androidInfo['launcher_info'] = launcherInfo;
-          print('📱 Launcher info: $launcherInfo');
+          print('Launcher info: $launcherInfo');
         } catch (e) {
           androidInfo['launcher_info_error'] = e.toString();
-          print('❌ Could not get launcher info: $e');
+          print('Could not get launcher info: $e');
         }
 
         // Check permissions
         try {
           final permissions = await platform.invokeMethod('checkPermissions');
           androidInfo['permissions'] = permissions;
-          print('🔐 Permissions: $permissions');
+          print('Permissions: $permissions');
         } catch (e) {
           androidInfo['permissions_error'] = e.toString();
-          print('❌ Could not check permissions: $e');
+          print('Could not check permissions: $e');
         }
       }
     } catch (e) {
       androidInfo['error'] = e.toString();
-      print('❌ Error checking Android support: $e');
+      print('Error checking Android support: $e');
     }
 
     return androidInfo;
